@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>AJAX三级省市区联动</title>
+	<meta charset="utf-8">
+	<meta name="16222555YLZ" content="" />
+	<style type="text/css">
+		select {
+				 appearance:none;
+				 -moz-appearance:none;
+				 -webkit-appearance:none;
+				 background: url("http://ourjs.github.io/static/2015/arrow.png") no-repeat scroll right center transparent;
+				 padding-left: 14px;
+				 font-size:120%;
+}
+
+	</style>
+	
+</head>
+<body background="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525527581759&di=5a234f164c50d71dbabcbd7dc2cea08e&imgtype=0&src=http%3A%2F%2Ff.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fd01373f082025aaff17ed8fbf3edab64034f1ab5.jpg" style="text-align: center;position:fixed;height:160px;top:0;right:0;bottom:0;left:0;margin:auto;font-size:200%">
+	<a>省份</a>
+	<select name="large" id="large" valu>
+		<option>--请选择--</option>
+	</select>
+	<a>城市</a>
+	<select name="medium" id="medium">
+		<option>--请选择--</option>
+	</select>
+	<a>区县</a>
+	<select name="small" id="small">
+		<option>--请选择--</option>
+	</select>
+
+	<script src="jquery-3.3.1.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$.ajaxSetup({
+				cache: false,
+			});
+
+			$.ajax({
+				type:"get",
+				url:"region.json",
+				datatype:"json",
+				success:function(data){
+					for(var i = 0;i < data.length;i++){
+						//console.log(data)
+						$("#large").append("<option id=" + i + " name=" + data[i].name + ">" +  data[i].name + "</option>");
+					}
+				}
+			});
+
+			$("#large").change(function(){
+				var lId = $("#large option:selected").attr("id") ;
+				//console.log(lId);
+				$("#medium").empty();
+				$("#medium").append("<option>--请选择市--</option>");
+				$.ajax({
+					type:"get",
+					url:"region.json",
+					success:function(data){
+						//console.log(data[lId].city.length);
+						for(var i = 0;i < data[lId].city.length;i++){
+							$("#medium").append("<option id=" + i + " city=" + i + ">" +  data[lId].city[i].name + "</option>");
+						}
+					}
+				});
+
+					$("#medium").change(function(){
+						var MId = $("#medium option:selected").attr("id");
+						//console.log(MId);
+						$("#small").empty();
+						$("#small").append("<option>--请选择区--</option>");
+						$.ajax({
+							type:"get",
+							url:"region.json",
+							success:function(data){
+								var lId = $("#large option:selected").attr("id") ;
+								//不加这句有BUG，更换省份后lId不会覆盖原来的，而是继续再加上
+								//console.log(lId);
+								//console.log(data[lId].city[MId]);
+								for(var i = 0;i < data[lId].city[MId].area.length;i++){
+									$("#small").append("<option id=" + i + " name=" + data[lId].city[MId].area[i] + ">" +  data[lId].city[MId].area[i] + "</option>");
+								}
+							}
+						});
+					});
+			});
+		})
+	</script>
+</body>
+</html>
